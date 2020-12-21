@@ -1,114 +1,125 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
+import React, {Component} from 'react';
+import { ScrollView, StyleSheet, TextInput, View, Text, Image, TouchableOpacity, Button, Modal} from 'react-native';
 
-import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+export default class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: 'Film Search',
+      temp: 'Batman',
+      searchText: 'Batman',
+      data: [],
+     
+    };
+  }
+  componentDidMount = async () => {
+    try {
+      const response = await fetch(`http://api.tvmaze.com/search/shows?q=${this.state.temp}`)
+      const data = await response.json()
+      this.setState({ data })
+      console.log({ data })
+    } catch (e){
+     console.log("Error")
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+    }
+    }
+  tryToSearch = async ()=>{
+    try {
+      const response = await fetch(`http://api.tvmaze.com/search/shows?q=${this.state.searchText}`)
+      const data = await response.json()
+      this.setState({ data })
+      console.log({ data })
+    } catch (e){
+     console.log("Error")
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
-  );
-};
+    }
+   }
+  mainImage = 'https://via.placeholder.com/200x250?text=Film+Search'
+  
+  render() {
+    return (
+      <View style={styles.container}>
+       <Text style={styles.titleName}>
+        {this.state.title}
+       </Text>
+       <TextInput style={styles.search}
+        onChangeText={text => this.setState((prevState) => ({searchText : prevState.searchText = text}))}
+        placeholder='movie name is...'>
+       </TextInput>
+       <TouchableOpacity onPress={this.tryToSearch} style={styles.touchableStyle}><Text style={styles.touchableText}>Search</Text></TouchableOpacity>
+       <ScrollView style={styles.results}>
+         {this.state.data.map((movies, index)=>{
+           return (<View key={index}>
+             <Image style={styles.image}
+             source={{uri: movies?.show?.image?.medium ?? this.mainImage}}></Image>
+            <Text style={styles.result}>
+              {movies.show.name}
+            </Text>
+            
+                    
+           </View>)
+         })
+         }
+       </ScrollView>
+      </View>
+      
+    );
+  }
+}
 
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-});
-
-export default App;
+export const styles = StyleSheet.create({
+container:{
+  flex: 1,
+  backgroundColor: '#0f123f',
+  justifyContent: 'flex-start',
+},
+titleName:{
+  marginTop: 30,
+  fontSize: 32,
+  fontWeight: '700',
+  textAlign: 'center',
+  color: 'white'
+},
+search:{
+marginTop: 20,
+fontSize:20,
+fontWeight: '300',
+padding: 20,
+width: '100%',
+backgroundColor: 'white',
+borderRadius: 50,
+},
+results:{
+flex : 1,
+},
+touchableStyle:{
+  alignSelf: 'center',
+  width: 200,
+  marginTop: 20,
+  backgroundColor: "#fd93d5",
+  padding: 15,
+  borderRadius: 50,
+},
+touchableText:{
+  color: "white",
+  fontSize: 20,
+  justifyContent: "center",
+  textAlign: "center",
+},
+result:{
+  fontSize: 25,
+  color: 'white',
+  alignSelf: 'center',
+  backgroundColor:'#280e65',
+  borderRadius: 20,
+  padding: 5,
+},
+image:{
+alignSelf: 'center',
+marginTop: 30,
+resizeMode: 'contain',
+width:400,
+height:420,
+borderRadius: 10
+},
+})
